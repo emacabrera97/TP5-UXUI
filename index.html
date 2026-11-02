@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cubrí Seguros</title>
+
+  <!-- Fuente Inter (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+
+  <!-- Basecoat UI (estilos de componentes) -->
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/basecoat-css@1.1.0/dist/basecoat.cdn.min.css">
+  <!-- Tailwind v4 en el navegador (utilidades) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <!-- Nuestros tokens: se cargan DESPUÉS para poder sobrescribir a Basecoat -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <!-- Toda la lógica va en archivos .js (nada de onclick="" en el HTML) -->
+  <script type="module" src="js/app.js"></script>
+</head>
+
+<body class="min-h-screen">
+
+  <!-- ===== Herramienta temporal de desarrollo (BORRAR antes de entregar) ===== -->
+  <div id="dev-nav" class="flex flex-wrap items-center gap-2 border-b border-dashed border-amber-400 bg-amber-50 p-2 text-xs">
+    <strong>DEV · ir al paso:</strong>
+    <button class="btn" data-variant="outline" data-ir="0">0 Inicio</button>
+    <button class="btn" data-variant="outline" data-ir="1">1 Cotizar</button>
+    <button class="btn" data-variant="outline" data-ir="2">2 Planes</button>
+    <button class="btn" data-variant="outline" data-ir="3">3 Datos</button>
+    <button class="btn" data-variant="outline" data-ir="4">4 Pago</button>
+    <button class="btn" data-variant="outline" data-ir="5">5 Éxito</button>
+    <button class="btn" data-variant="outline" data-ir="6">6 Error</button>
+  </div>
+
+  <main class="mx-auto max-w-5xl p-4 lg:p-8">
+
+    <!-- Cada paso es una <section data-paso="N">. render() muestra solo la del paso actual. -->
+    <section data-paso="0" hidden>
+      <h2 class="text-2xl font-extrabold">01 · Inicio / Catálogo</h2>
+      <p class="text-slate-500">Acá va el catálogo de 4 productos.</p>
+    </section>
+
+    <section data-paso="1" hidden>
+      <h2 class="text-2xl font-extrabold">02 · Cotizar (Paso 1)</h2>
+      <p class="text-slate-500">Acá va el formulario del equipo.</p>
+    </section>
+
+    <section data-paso="2" hidden>
+      <h2 class="text-2xl font-extrabold">03 · Elegir plan (Paso 2)</h2>
+      <p class="text-slate-500">Acá van los 3 planes.</p>
+    </section>
+
+    <section data-paso="3" hidden>
+      <h2 class="text-2xl font-extrabold">04 · Datos personales (Paso 3)</h2>
+      <p class="text-slate-500">Acá va el formulario del titular.</p>
+    </section>
+
+    <section data-paso="4" hidden>
+      <h2 class="text-2xl font-extrabold">05 · Pago (Paso 4)</h2>
+      <p class="text-slate-500">Acá va el resumen y el formulario de pago.</p>
+    </section>
+
+    <section data-paso="5" hidden>
+      <h2 class="text-2xl font-extrabold">06 · Éxito</h2>
+      <p class="text-slate-500">Acá va la póliza.</p>
+    </section>
+
+    <section data-paso="6" hidden>
+      <h2 class="text-2xl font-extrabold">07 · Error de pago</h2>
+      <p class="text-slate-500">Acá va el mensaje de rechazo.</p>
+    </section>
+
+  </main>
+</body>
+</html>

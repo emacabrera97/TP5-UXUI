@@ -1,0 +1,25 @@
+/* css/tokens.css
+   Tokens del diseño (sección 3.4 del TP).
+   Basecoat usa variables CSS estilo shadcn: acá sobrescribimos el color primario
+   para que coincida con el Figma. */
+:root {
+  --primary: #4F46E5;            /* indigo-600 */
+  --primary-foreground: #FFFFFF;
+  --radius: 0.75rem;
+
+  /* Tokens propios (los usamos nosotros, no Basecoat) */
+  --primary-700: #3730A3;        /* indigo-800: textos destacados */
+  --primary-50: #EEF2FF;         /* indigo-50: fondos de selección y resumen */
+  --success: #059669;            /* emerald-600: pasos completos, éxito */
+  --error: #DC2626;              /* red-600: errores de validación y pago */
+  --text: #0F172A;               /* slate-900 */
+  --muted: #64748B;              /* slate-500 */
+  --border: #E2E8F0;             /* slate-200 */
+  --bg: #F5F7FB;                 /* fondo de página */
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
