@@ -1,0 +1,182 @@
+/* css/componentes.css
+   Ajustes sobre Basecoat y piezas propias (stepper, chips, cards de plan...).
+   Estos estilos NO están dentro de ningún @layer, así que ganan sobre los de Basecoat.
+   REGLA: en las clases propias no definimos "display" cuando el elemento también usa
+   utilidades de Tailwind como hidden/lg:flex (si no, nuestro CSS le ganaría a Tailwind). */
+
+/* ---------- Íconos ---------- */
+.icon { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+/* ---------- Logo ---------- */
+.logo { display: inline-flex; align-items: center; gap: 8px; }
+.logo-mark { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--primary); color: #fff; }
+.logo-texto { font-size: 18px; font-weight: 800; color: var(--primary); }
+
+/* ---------- Botones del flujo (Figma: alto 52, radio 14, texto 16/700) ---------- */
+.btn.btn-xl { height: 52px; padding-inline: 24px; border-radius: 14px; font-size: 16px; font-weight: 700; }
+.btn.btn-xl[data-variant="outline"] { background-color: #fff; border: 2px solid var(--primary); color: var(--primary); }
+.btn.btn-xl[data-variant="ghost"] { background-color: transparent; color: var(--primary); }
+/* Deshabilitado: gris sólido, sin transparencia (va después de las variantes) */
+.btn.btn-xl:disabled { background-color: #CBD5E1; border-color: transparent; color: #fff; opacity: 1; cursor: not-allowed; }
+/* "Volver al inicio": ghost en mobile, con borde en desktop */
+@media (min-width: 1024px) {
+  .btn.btn-xl.btn-secundario-lg[data-variant="ghost"] { background-color: #fff; border: 2px solid var(--primary); }
+}
+
+/* ---------- Campos (.field): Figma = alto 48, radio 12, texto 15 ---------- */
+.field > label { font-size: 13px; font-weight: 600; line-height: 16px; color: var(--text); }
+.field > :is(input, select):not([type="checkbox"]):not([type="radio"]) {
+  height: 48px; padding-inline: 14px; border: 1px solid var(--border); border-radius: 12px;
+  background-color: #fff; color: var(--text); font-size: 15px; box-shadow: none;
+}
+.field > select { padding-right: 40px; }
+.field > :is(input, select)::placeholder { color: #94A3B8; }
+/* Foco: borde primario de 2px (el segundo píxel es sombra, así el campo no "salta") */
+.field > :is(input, select):not([type="checkbox"]):not([type="radio"]):focus-visible {
+  border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); outline: none;
+}
+/* Error: fondo rosado + borde rojo de 2px */
+.field[data-invalid] > :is(input, select):not([type="checkbox"]):not([type="radio"]) {
+  background-color: #FEF2F2; border-color: var(--error); box-shadow: 0 0 0 1px var(--error);
+}
+.field > p { font-size: 12px; line-height: 15px; color: var(--muted); }
+.field[data-invalid] > p[role="alert"] { color: var(--error); }
+.field > label.terminos { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; font-weight: 400; line-height: 1.45; color: var(--muted); }
+
+/* ---------- Chips de antigüedad (radio + label) ---------- */
+.chip { display: inline-flex; align-items: center; height: 41px; padding-inline: 16px; border: 1px solid var(--border); border-radius: 999px; background-color: #fff; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; }
+.chip:has(input:checked) { height: 41px; padding-inline: 15px; border: 2px solid var(--primary); background-color: var(--primary-50); color: var(--primary-700); font-weight: 700; }
+.chip:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* ---------- Radio visual compartido (planes y medio de pago) ---------- */
+.plan-radio { display: grid; place-items: center; flex-shrink: 0; width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 999px; background-color: #fff; }
+.plan-card:has(input:checked) .plan-radio,
+.pay-option:has(input:checked) .plan-radio { background-color: var(--primary); border-color: var(--primary); }
+.plan-card:has(input:checked) .plan-radio::after,
+.pay-option:has(input:checked) .plan-radio::after { content: ""; width: 8px; height: 8px; border-radius: 999px; background: #fff; }
+
+/* ---------- Cards de plan (toda la card es clickeable) ---------- */
+.plan-card { display: block; cursor: pointer; padding: 17px; border: 1px solid var(--border); border-radius: 16px; background-color: #fff; transition: border-color .15s, box-shadow .15s; }
+.plan-card:has(input:checked) { padding: 16px; border: 2px solid var(--primary); box-shadow: 0 0 0 4px rgb(79 70 229 / .12); }
+.plan-card:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 3px; }
+.plan-head { display: flex; align-items: center; justify-content: space-between; }
+.plan-nombre { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 800; color: var(--text); }
+.plan-precio { display: flex; align-items: baseline; gap: 6px; margin-top: 8px; }
+.plan-precio strong { font-size: 28px; font-weight: 800; letter-spacing: -0.01em; color: var(--text); }
+.plan-precio span { font-size: 13px; color: var(--muted); }
+.plan-coberturas { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.plan-coberturas li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+.plan-coberturas li svg { color: var(--success); }
+.plan-coberturas li[data-no], .plan-coberturas li[data-no] svg { color: #94A3B8; }
+@media (min-width: 1024px) {
+  .plan-card { padding: 21px; }
+  .plan-card:has(input:checked) { padding: 20px; }
+  .plan-precio strong { font-size: 30px; }
+  .plan-coberturas { gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+}
+
+/* ---------- Medio de pago ---------- */
+.pay-option { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid var(--border); border-radius: 14px; background-color: #fff; font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer; }
+.pay-option:has(input:checked) { padding: 15px; border: 2px solid var(--primary); }
+.pay-option:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 3px; }
+
+/* ---------- Badges ---------- */
+.badge.badge-success { height: auto; padding: 4px 8px; background-color: #ECFDF5; color: var(--success); font-size: 11px; font-weight: 700; }
+.badge.badge-recomendado { height: 21px; padding-inline: 8px; background-color: var(--primary); color: #fff; font-size: 11px; font-weight: 700; }
+
+/* ---------- Cards de producto (inicio) ---------- */
+.product-card { position: relative; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; height: 150px; padding: 16px; border: 1px solid var(--border); border-radius: 16px; background-color: #fff; text-align: left; }
+.product-card[aria-pressed="true"] { padding: 15px; border: 2px solid var(--primary); }
+.product-card:disabled { cursor: not-allowed; opacity: .7; }
+.product-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background-color: var(--primary-50); color: var(--primary); }
+.product-texto { display: flex; flex-direction: column; gap: 2px; }
+.product-texto strong { font-size: 16px; font-weight: 700; color: var(--text); }
+.product-texto span { font-size: 12px; color: var(--muted); }
+.product-texto .product-desde { margin-top: 2px; font-weight: 600; color: var(--primary); }
+.product-proximamente { position: absolute; top: 12px; right: 12px; height: auto; padding: 2px 8px; font-size: 10px; }
+@media (min-width: 1024px) {
+  .product-card { height: 180px; padding: 26px; }
+  .product-card[aria-pressed="true"] { padding: 25px; }
+  .product-icon { width: 48px; height: 48px; }
+  .product-texto strong { font-size: 18px; }
+  .product-texto span { font-size: 13px; }
+  .product-proximamente { top: 16px; right: 16px; }
+}
+
+/* ---------- Stepper (lo genera render.js: 3 estados) ---------- */
+.stepper { display: flex; align-items: center; gap: 6px; margin: 0; padding: 14px 20px; list-style: none; background-color: #fff; border-bottom: 1px solid var(--border); }
+.stepper .paso { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.stepper .dot { display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 999px; background-color: #fff; font-size: 11px; font-weight: 700; color: var(--muted); }
+.stepper .paso[data-estado="activo"] { color: var(--primary); }
+.stepper .paso[data-estado="activo"] .dot { border-color: var(--primary); background-color: var(--primary); color: #fff; }
+.stepper .paso[data-estado="completo"] { color: var(--success); }
+.stepper .paso[data-estado="completo"] .dot { border-color: var(--success); background-color: var(--success); color: #fff; }
+.stepper .barra { flex: 1 1 0; min-width: 1px; height: 2px; background-color: var(--border); }
+.stepper .barra[data-completa] { background-color: var(--success); }
+@media (min-width: 1024px) {
+  .stepper { padding: 14px 18px; border: 1px solid var(--border); border-radius: 12px; }
+  .stepper .paso { gap: 8px; }
+}
+
+/* ---------- Checkout: contenedor del formulario ---------- */
+.checkout-main { padding: 20px 20px 210px; }   /* 210px: espacio para la barra fija de mobile */
+@media (min-width: 1024px) {
+  .checkout-main { padding: 32px; border: 1px solid var(--border); border-radius: 16px; background-color: #fff; }
+}
+
+/* Barras de acción: fijas abajo en mobile, dentro de la card en desktop */
+.acciones { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; flex-direction: column; gap: 12px; padding: 16px 20px 28px; border-top: 1px solid var(--border); background-color: #fff; }
+.barra-fija { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 16px 20px 28px; border-top: 1px solid var(--border); background-color: #fff; }
+@media (min-width: 1024px) {
+  .acciones { position: static; z-index: auto; margin-top: 28px; padding: 21px 0 0; background-color: transparent; }
+}
+
+/* ---------- Resumen (una sola vez, desde el estado) ---------- */
+.resumen { gap: 0; margin: 20px 20px 0; padding: 17px; border: 1px solid #C7D2FE; border-radius: 16px; background-color: var(--primary-50); box-shadow: none; }
+/* En mobile solo se muestra en el paso 4 */
+@media (max-width: 1023.98px) {
+  #checkout:not([data-paso-actual="4"]) > #resumen { display: none; }
+}
+.resumen-titulo { margin: 0 0 12px; font-size: 18px; font-weight: 800; color: var(--text); }
+.resumen-lista { display: grid; gap: 8px; margin: 0; }
+.resumen-separador { margin: 12px 0; border: 0; border-top: 1px solid #C7D2FE; }
+.resumen-ayuda { margin: 0; font-size: 12.5px; color: var(--muted); }
+.kv { justify-content: space-between; align-items: center; gap: 12px; font-size: 14px; line-height: 17px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-weight: 700; color: var(--text); text-align: right; }
+.kv.kv-total { font-size: 15px; }
+.kv.kv-total dd { font-size: 17px; font-weight: 800; }
+.confianza { align-items: center; gap: 8px; margin: 14px 0 0; font-size: 12px; color: var(--muted); }
+.confianza svg { color: var(--success); }
+@media (min-width: 1024px) {
+  .resumen { position: sticky; top: 24px; margin: 0; padding: 25px; border-color: var(--border); background-color: #fff; }
+  .resumen-lista { gap: 12px; }
+  .resumen-separador { border-top-color: var(--border); }
+  .kv { font-size: 13px; }
+  .kv.kv-total dd { font-size: 18px; }
+}
+
+/* ---------- Aviso de simulación (Basecoat .alert + colores del Figma) ---------- */
+.alert.alert-aviso { padding: 10px 12px; border-color: #FDE68A; border-radius: 12px; background-color: #FFFBEB; color: #B45309; font-size: 13px; }
+.alert.alert-aviso p { margin: 0; }
+
+/* ---------- Pantallas de resultado (éxito / error) ---------- */
+.resultado { padding: 0 20px 220px; }
+.resultado-card { display: flex; flex-direction: column; align-items: center; padding-top: 72px; text-align: center; }
+.resultado-icono { display: grid; place-items: center; width: 96px; height: 96px; margin-bottom: 18px; border-radius: 999px; }
+.resultado-icono-ok { background-color: #ECFDF5; color: var(--success); }
+.resultado-icono-error { background-color: #FEF2F2; color: var(--error); }
+.resultado-titulo { margin: 0; font-size: 24px; font-weight: 800; line-height: 1.25; color: var(--text); }
+.resultado-texto { margin: 16px 0 0; font-size: 15px; line-height: 1.5; color: var(--muted); }
+.poliza { margin: 18px 0 0; padding: 10px 16px; border-radius: 12px; background-color: var(--primary-50); color: var(--primary-700); font-size: 18px; font-weight: 800; letter-spacing: .06em; }
+.detalle { display: grid; gap: 8px; width: 100%; margin: 18px 0 0; padding: 17px; border: 1px solid var(--border); border-radius: 16px; background-color: #fff; text-align: left; }
+.resultado .alert-aviso { margin-top: 18px; text-align: left; }
+.resultado-acciones { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; flex-direction: column; gap: 12px; padding: 16px 20px 28px; border-top: 1px solid var(--border); background-color: #fff; }
+@media (min-width: 1024px) {
+  .resultado { padding: 64px 0; }
+  .resultado-card { max-width: 600px; margin: 0 auto; padding: 49px; border: 1px solid var(--border); border-radius: 16px; background-color: #fff; }
+  .resultado-icono { width: 88px; height: 88px; }
+  .resultado-titulo { font-size: 30px; }
+  .detalle { margin-top: 20px; padding: 20px; border-color: transparent; background-color: var(--bg); }
+  .resultado-acciones { position: static; z-index: auto; flex-direction: row; width: 100%; margin-top: 20px; padding: 0; border: 0; background-color: transparent; }
+}

@@ -8,69 +8,454 @@
   <!-- Fuente Inter (Google Fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Basecoat UI (estilos de componentes) -->
   <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/basecoat-css@1.1.0/dist/basecoat.cdn.min.css">
   <!-- Tailwind v4 en el navegador (utilidades) -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <!-- Nuestros tokens: se cargan DESPUÉS para poder sobrescribir a Basecoat -->
+  <!-- Nuestros estilos: se cargan DESPUÉS para poder ajustar a Basecoat -->
   <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/componentes.css">
   <!-- Toda la lógica va en archivos .js (nada de onclick="" en el HTML) -->
   <script type="module" src="js/app.js"></script>
 </head>
 
 <body class="min-h-screen">
 
+  <!-- Íconos (estilo Lucide). Se usan con <svg><use href="#i-nombre"/></svg> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  </svg>
+
   <!-- ===== Herramienta temporal de desarrollo (BORRAR antes de entregar) ===== -->
   <div id="dev-nav" class="flex flex-wrap items-center gap-2 border-b border-dashed border-amber-400 bg-amber-50 p-2 text-xs">
     <strong>DEV · ir al paso:</strong>
-    <button class="btn" data-variant="outline" data-ir="0">0 Inicio</button>
-    <button class="btn" data-variant="outline" data-ir="1">1 Cotizar</button>
-    <button class="btn" data-variant="outline" data-ir="2">2 Planes</button>
-    <button class="btn" data-variant="outline" data-ir="3">3 Datos</button>
-    <button class="btn" data-variant="outline" data-ir="4">4 Pago</button>
-    <button class="btn" data-variant="outline" data-ir="5">5 Éxito</button>
-    <button class="btn" data-variant="outline" data-ir="6">6 Error</button>
+    <button type="button" class="btn" data-variant="outline" data-ir="0">0 Inicio</button>
+    <button type="button" class="btn" data-variant="outline" data-ir="1">1 Cotizar</button>
+    <button type="button" class="btn" data-variant="outline" data-ir="2">2 Planes</button>
+    <button type="button" class="btn" data-variant="outline" data-ir="3">3 Datos</button>
+    <button type="button" class="btn" data-variant="outline" data-ir="4">4 Pago</button>
+    <button type="button" class="btn" data-variant="outline" data-ir="5">5 Éxito</button>
+    <button type="button" class="btn" data-variant="outline" data-ir="6">6 Error</button>
   </div>
 
-  <main class="mx-auto max-w-5xl p-4 lg:p-8">
+  <!-- ===== Encabezado desktop (en todas las pantallas) ===== -->
+  <header class="hidden border-b border-slate-200 bg-white lg:block">
+    <div class="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-20">
+      <a href="#" class="logo" data-accion="inicio" aria-label="Cubrí Seguros, ir al inicio">
+        <span class="logo-mark"><svg class="icon size-4" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg></span>
+        <span class="logo-texto">Cubrí</span>
+      </a>
+      <nav class="flex items-center gap-8 text-[15px] text-slate-500" aria-label="Principal">
+        <a href="#">Seguros</a>
+        <a href="#">Siniestros</a>
+        <a href="#">Ayuda</a>
+        <button type="button" class="btn" data-variant="outline" data-size="sm">Mi cuenta</button>
+      </nav>
+    </div>
+  </header>
 
-    <!-- Cada paso es una <section data-paso="N">. render() muestra solo la del paso actual. -->
+  <!-- ===== Barra superior mobile (el JS decide cuál de las dos variantes se ve) ===== -->
+  <div id="topbar-movil" class="border-b border-slate-200 bg-white lg:hidden">
+    <div data-topbar="logo" class="flex h-14 items-center px-5">
+      <a href="#" class="logo" data-accion="inicio" aria-label="Cubrí Seguros, ir al inicio">
+        <span class="logo-mark"><svg class="icon size-4" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg></span>
+        <span class="logo-texto">Cubrí</span>
+      </a>
+    </div>
+    <div data-topbar="titulo" hidden class="flex h-14 items-center gap-3 px-5">
+      <button type="button" data-accion="volver" aria-label="Volver" class="-ml-1 grid size-8 place-items-center rounded-lg text-slate-900">
+        <svg class="icon size-6" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg>
+      </button>
+      <span id="titulo-movil" class="text-[17px] font-bold text-slate-900"></span>
+    </div>
+  </div>
+
+  <!-- Título del paso (solo desktop) -->
+  <div id="encabezado-paso" hidden class="mx-auto hidden w-full max-w-[1280px] px-20 pt-8 lg:block">
+    <p class="text-[13px] font-semibold text-indigo-600">Seguro de Celular</p>
+    <h1 id="titulo-desktop" class="mt-1 text-[30px] font-extrabold leading-tight text-slate-900"></h1>
+  </div>
+
+  <!-- Stepper (lo pinta render.js a partir del estado) -->
+  <div id="stepper-wrap" hidden class="mx-auto w-full max-w-[1280px] lg:px-20 lg:pt-6">
+    <ol id="stepper" class="stepper" aria-label="Progreso de la contratación"></ol>
+  </div>
+
+  <main id="contenido">
+
+    <!-- =====================================================
+         01 · INICIO / CATÁLOGO
+         ===================================================== -->
     <section data-paso="0" hidden>
-      <h2 class="text-2xl font-extrabold">01 · Inicio / Catálogo</h2>
-      <p class="text-slate-500">Acá va el catálogo de 4 productos.</p>
+      <div class="mx-auto max-w-[1280px] px-5 pb-32 pt-5 lg:px-20 lg:pb-16 lg:pt-[76px]">
+
+        <div class="grid gap-4 lg:grid-cols-[1fr_600px] lg:items-center lg:gap-16">
+          <!-- Hero -->
+          <div>
+            <span class="badge badge-success hidden lg:inline-flex">Primer mes con 20% OFF</span>
+            <h1 class="text-2xl font-extrabold leading-tight text-slate-900 lg:mt-5 lg:text-[56px] lg:leading-[1.05] lg:tracking-tight">
+              Protegé lo que más usás en menos de 3 minutos
+            </h1>
+            <p class="mt-4 text-[15px] leading-normal text-slate-500 lg:mt-5 lg:text-lg">
+              <span class="lg:hidden">Elegí qué querés asegurar. Cotizás al instante y contratás 100% online.</span>
+              <span class="hidden lg:inline">Elegí qué querés asegurar, cotizá al instante y contratá 100% online. Sin papeles ni llamadas.</span>
+            </p>
+            <button type="button" class="btn btn-xl mt-8 hidden w-[220px] lg:inline-flex" data-accion="iniciar">Cotizar ahora</button>
+          </div>
+
+          <!-- Productos: solo Celular está habilitado -->
+          <div class="grid grid-cols-2 gap-3 lg:gap-4">
+            <button type="button" class="product-card" aria-pressed="true">
+              <span class="product-icon"><svg class="icon size-6" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone"/></svg></span>
+              <span class="product-texto">
+                <strong>Celular</strong>
+                <span>Robo, rotura y pérdida</span>
+                <span class="product-desde hidden lg:block">desde $2.000/mes</span>
+              </span>
+            </button>
+            <button type="button" class="product-card" disabled aria-disabled="true">
+              <span class="badge product-proximamente" data-variant="secondary">Próximamente</span>
+              <span class="product-icon"><svg class="icon size-6" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-home"/></svg></span>
+              <span class="product-texto">
+                <strong>Hogar</strong>
+                <span>Incendio y robo</span>
+                <span class="product-desde hidden lg:block">desde $5.500/mes</span>
+              </span>
+            </button>
+            <button type="button" class="product-card" disabled aria-disabled="true">
+              <span class="badge product-proximamente" data-variant="secondary">Próximamente</span>
+              <span class="product-icon"><svg class="icon size-6" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bike"/></svg></span>
+              <span class="product-texto">
+                <strong>Bicicleta</strong>
+                <span>Robo total</span>
+                <span class="product-desde hidden lg:block">desde $1.800/mes</span>
+              </span>
+            </button>
+            <button type="button" class="product-card" disabled aria-disabled="true">
+              <span class="badge product-proximamente" data-variant="secondary">Próximamente</span>
+              <span class="product-icon"><svg class="icon size-6" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-send"/></svg></span>
+              <span class="product-texto">
+                <strong>Viaje</strong>
+                <span>Asistencia al viajero</span>
+                <span class="product-desde hidden lg:block">desde $900/día</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Promo (solo mobile) -->
+        <div class="mt-4 flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 lg:hidden">
+          <span class="badge badge-success">NUEVO</span>
+          <p class="text-[13px] text-slate-500">Primer mes con 20% OFF en todos los planes</p>
+        </div>
+
+        <!-- Beneficios (solo desktop) -->
+        <div class="mt-16 hidden gap-6 lg:grid lg:grid-cols-3">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6">
+            <p class="font-bold text-slate-900">100% online</p>
+            <p class="mt-1 text-[13px] text-slate-500">Cotizás y contratás desde la web</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-6">
+            <p class="font-bold text-slate-900">Póliza al instante</p>
+            <p class="mt-1 text-[13px] text-slate-500">La recibís por email al confirmar</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-6">
+            <p class="font-bold text-slate-900">Sin permanencia</p>
+            <p class="mt-1 text-[13px] text-slate-500">Cancelás cuando quieras</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer fijo (solo mobile) -->
+      <div class="barra-fija lg:hidden">
+        <button type="button" class="btn btn-xl w-full" data-accion="iniciar">Cotizar seguro de Celular</button>
+      </div>
     </section>
 
-    <section data-paso="1" hidden>
-      <h2 class="text-2xl font-extrabold">02 · Cotizar (Paso 1)</h2>
-      <p class="text-slate-500">Acá va el formulario del equipo.</p>
+
+    <!-- =====================================================
+         PASOS 1 a 4 · CHECKOUT (formulario + resumen)
+         Mobile: una columna. Desktop (lg:): formulario + resumen de 380px.
+         ===================================================== -->
+    <div id="checkout" hidden class="mx-auto flex w-full max-w-[1280px] flex-col lg:grid lg:grid-cols-[1fr_380px] lg:items-start lg:gap-8 lg:px-20 lg:py-6">
+
+      <div class="checkout-main">
+
+        <!-- ---------- PASO 1 · COTIZAR ---------- -->
+        <section data-paso="1" hidden>
+          <form novalidate class="grid gap-4 lg:grid-cols-2 lg:gap-x-5 lg:gap-y-5">
+            <h2 class="text-2xl font-extrabold text-slate-900 lg:hidden">Contanos sobre tu celular</h2>
+
+            <div role="group" class="field">
+              <label for="marca">Marca</label>
+              <select id="marca" name="marca" required aria-describedby="marca-error">
+                <option value="">Seleccioná una marca</option>
+                <option value="Samsung">Samsung</option>
+                <option value="Apple">Apple</option>
+                <option value="Motorola">Motorola</option>
+                <option value="Xiaomi">Xiaomi</option>
+                <option value="Otra">Otra</option>
+              </select>
+              <p id="marca-error" role="alert" hidden>Elegí una marca</p>
+            </div>
+
+            <div role="group" class="field">
+              <label for="modelo">Modelo</label>
+              <input id="modelo" name="modelo" type="text" maxlength="40" autocomplete="off" placeholder="Ej.: Galaxy A55" aria-describedby="modelo-error">
+              <p id="modelo-error" role="alert" hidden>Ingresá el modelo del equipo</p>
+            </div>
+
+            <div role="group" class="field">
+              <label for="valor">Valor del equipo</label>
+              <input id="valor" name="valor" type="text" inputmode="numeric" autocomplete="off" placeholder="$ 600.000" aria-describedby="valor-ayuda valor-error">
+              <p id="valor-ayuda">Entre $100.000 y $2.500.000</p>
+              <p id="valor-error" role="alert" hidden>El valor debe estar entre $100.000 y $2.500.000</p>
+            </div>
+
+            <div role="radiogroup" class="field" aria-labelledby="antiguedad-label">
+              <label id="antiguedad-label">Antigüedad</label>
+              <div class="flex flex-wrap gap-2">
+                <label class="chip"><input type="radio" name="antiguedad" value="menos-1" class="sr-only">Menos de 1 año</label>
+                <label class="chip"><input type="radio" name="antiguedad" value="1-2" class="sr-only">1 a 2 años</label>
+                <label class="chip"><input type="radio" name="antiguedad" value="mas-2" class="sr-only">+2 años</label>
+              </div>
+              <p id="antiguedad-error" role="alert" hidden>Indicá la antigüedad</p>
+            </div>
+          </form>
+        </section>
+
+        <!-- ---------- PASO 2 · ELEGIR PLAN ---------- -->
+        <!-- H3: estas 3 cards se van a generar desde data/planes.json -->
+        <section data-paso="2" hidden>
+          <form novalidate>
+            <fieldset class="grid gap-3 lg:grid-cols-3 lg:gap-4">
+              <legend class="sr-only">Elegí tu plan</legend>
+
+              <label class="plan-card">
+                <input type="radio" name="plan" value="basico" class="sr-only">
+                <span class="plan-head"><span class="plan-nombre">Básico</span><span class="plan-radio" aria-hidden="true"></span></span>
+                <span class="plan-precio"><strong>$ 2.000</strong><span>/ mes</span></span>
+                <ul class="plan-coberturas">
+                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Robo con violencia</li>
+                  <li data-no><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-x"/></svg>Rotura de pantalla</li>
+                  <li data-no><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-x"/></svg>Hurto / pérdida</li>
+                </ul>
+              </label>
+
+              <label class="plan-card">
+                <input type="radio" name="plan" value="plus" class="sr-only" checked>
+                <span class="plan-head">
+                  <span class="plan-nombre">Plus <span class="badge badge-recomendado">Recomendado</span></span>
+                  <span class="plan-radio" aria-hidden="true"></span>
+                </span>
+                <span class="plan-precio"><strong>$ 3.000</strong><span>/ mes</span></span>
+                <ul class="plan-coberturas">
+                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Robo con violencia</li>
+                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Rotura de pantalla</li>
+                  <li data-no><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-x"/></svg>Hurto / pérdida</li>
+                </ul>
+              </label>
+
+              <label class="plan-card">
+                <input type="radio" name="plan" value="premium" class="sr-only">
+                <span class="plan-head"><span class="plan-nombre">Premium</span><span class="plan-radio" aria-hidden="true"></span></span>
+                <span class="plan-precio"><strong>$ 4.500</strong><span>/ mes</span></span>
+                <ul class="plan-coberturas">
+                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Robo con violencia</li>
+                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Rotura total</li>
+                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Hurto / pérdida</li>
+                </ul>
+              </label>
+            </fieldset>
+          </form>
+        </section>
+
+        <!-- ---------- PASO 3 · DATOS PERSONALES ---------- -->
+        <section data-paso="3" hidden>
+          <form novalidate class="grid grid-cols-2 gap-x-3 gap-y-4 lg:grid-cols-3 lg:gap-x-5 lg:gap-y-5">
+
+            <div role="group" class="field">
+              <label for="nombre">Nombre</label>
+              <input id="nombre" name="nombre" type="text" autocomplete="given-name" aria-describedby="nombre-error">
+              <p id="nombre-error" role="alert" hidden>Ingresá tu nombre</p>
+            </div>
+
+            <div role="group" class="field">
+              <label for="apellido">Apellido</label>
+              <input id="apellido" name="apellido" type="text" autocomplete="family-name" aria-describedby="apellido-error">
+              <p id="apellido-error" role="alert" hidden>Ingresá tu apellido</p>
+            </div>
+
+            <div role="group" class="field">
+              <label for="dni">DNI</label>
+              <input id="dni" name="dni" type="text" inputmode="numeric" maxlength="8" autocomplete="off" aria-describedby="dni-error">
+              <p id="dni-error" role="alert" hidden>El DNI debe tener 7 u 8 números</p>
+            </div>
+
+            <div role="group" class="field">
+              <label for="nacimiento">Nacimiento</label>
+              <input id="nacimiento" name="nacimiento" type="date" autocomplete="bday" aria-describedby="nacimiento-error">
+              <p id="nacimiento-error" role="alert" hidden>Tenés que ser mayor de edad</p>
+            </div>
+
+            <!-- DEMO H1: así se ve un campo con error (lo maneja validaciones.js en H3) -->
+            <div role="group" class="field col-span-2 lg:col-span-1" data-invalid>
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" value="juan.perez@" aria-invalid="true" aria-describedby="email-error">
+              <p id="email-error" role="alert">Ingresá un email válido</p>
+            </div>
+
+            <div role="group" class="field col-span-2 lg:col-span-1">
+              <label for="celular">Celular</label>
+              <input id="celular" name="celular" type="tel" inputmode="tel" autocomplete="tel" placeholder="11 5555-1234" aria-describedby="celular-error">
+              <p id="celular-error" role="alert" hidden>Ej.: 11 5555-1234</p>
+            </div>
+
+            <div role="group" class="field col-span-2 lg:col-span-3">
+              <label class="terminos">
+                <input id="terminos" name="terminos" type="checkbox" aria-describedby="terminos-error">
+                <span>Acepto los términos y condiciones y la política de privacidad.</span>
+              </label>
+              <p id="terminos-error" role="alert" hidden>Tenés que aceptar los términos</p>
+            </div>
+          </form>
+        </section>
+
+        <!-- ---------- PASO 4 · PAGO ---------- -->
+        <section data-paso="4" hidden>
+          <form novalidate>
+            <fieldset class="grid gap-3 lg:grid-cols-2 lg:gap-4">
+              <legend class="sr-only">Medio de pago</legend>
+              <label class="pay-option">
+                <input type="radio" name="metodo" value="credito" class="sr-only" checked>
+                <span class="plan-radio" aria-hidden="true"></span>
+                <span>Tarjeta de crédito</span>
+              </label>
+              <label class="pay-option">
+                <input type="radio" name="metodo" value="debito" class="sr-only">
+                <span class="plan-radio" aria-hidden="true"></span>
+                <span>Tarjeta de débito</span>
+              </label>
+            </fieldset>
+
+            <div class="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 lg:mt-5 lg:gap-x-5 lg:gap-y-5">
+              <div role="group" class="field col-span-2 lg:col-span-1">
+                <label for="tarjeta">Número de tarjeta</label>
+                <input id="tarjeta" name="tarjeta" type="text" inputmode="numeric" maxlength="19" autocomplete="cc-number" placeholder="4111 1111 1111 1111" aria-describedby="tarjeta-error">
+                <p id="tarjeta-error" role="alert" hidden>Número de tarjeta inválido</p>
+              </div>
+              <div role="group" class="field col-span-2 lg:col-span-1">
+                <label for="titular-tarjeta">Titular</label>
+                <input id="titular-tarjeta" name="titular-tarjeta" type="text" autocomplete="cc-name" aria-describedby="titular-tarjeta-error">
+                <p id="titular-tarjeta-error" role="alert" hidden>Ingresá el nombre del titular</p>
+              </div>
+              <div role="group" class="field lg:col-span-1">
+                <label for="vencimiento">Vencimiento</label>
+                <input id="vencimiento" name="vencimiento" type="text" inputmode="numeric" maxlength="5" autocomplete="cc-exp" placeholder="MM/AA" aria-describedby="vencimiento-error">
+                <p id="vencimiento-error" role="alert" hidden>Vencimiento inválido</p>
+              </div>
+              <div role="group" class="field lg:col-span-1">
+                <label for="cvv">CVV</label>
+                <input id="cvv" name="cvv" type="password" inputmode="numeric" maxlength="3" autocomplete="cc-csc" placeholder="•••" aria-describedby="cvv-error">
+                <p id="cvv-error" role="alert" hidden>CVV inválido</p>
+              </div>
+            </div>
+
+            <div class="alert alert-aviso mt-4 lg:mt-5" role="note">
+              <p>Simulación: no se procesan pagos reales. Usá la tarjeta de prueba 4111 1111 1111 1111.</p>
+            </div>
+          </form>
+        </section>
+
+        <!-- ---------- Acciones (una sola barra para los 4 pasos) ---------- -->
+        <footer id="acciones" class="acciones">
+          <!-- Mobile, paso 2: resumen corto arriba del botón (lo genera renderResumen en H2) -->
+          <div data-solo-en="2" hidden class="flex items-center justify-between text-[13px] lg:hidden">
+            <span class="text-slate-500" data-ref="barra-plan">Plan Plus · Galaxy A55</span>
+            <strong class="text-slate-900" data-ref="barra-total">$ 3.000/mes</strong>
+          </div>
+          <div class="flex items-center gap-3 lg:justify-between">
+            <button type="button" class="btn btn-xl hidden w-40 lg:inline-flex" data-variant="outline" data-accion="volver" data-solo-en="2 3 4">Volver</button>
+            <div class="flex flex-1 items-center justify-end gap-4 lg:ml-auto lg:flex-none">
+              <p class="hidden text-[13px] text-slate-500 lg:block" data-solo-en="3" hidden>Completá los campos con error para continuar</p>
+              <button type="button" id="btn-siguiente" class="btn btn-xl w-full lg:w-[240px]" data-accion="siguiente">Ver planes</button>
+            </div>
+          </div>
+          <p class="text-center text-xs text-slate-500 lg:hidden" data-solo-en="3" hidden>El botón se habilita cuando el formulario es válido</p>
+        </footer>
+      </div>
+
+      <!-- Resumen: UNA sola vez, desde el estado (renderResumen, H2).
+           Mobile: solo en el paso 4, arriba del formulario. Desktop: card lateral en los pasos 1 a 4. -->
+      <aside id="resumen" class="card resumen order-first lg:order-none" aria-label="Resumen de la solicitud">
+        <h2 class="resumen-titulo hidden lg:block">Resumen</h2>
+        <dl class="resumen-lista">
+          <div class="kv flex"><dt>Seguro</dt><dd><span data-ref="seguro">Celular</span><span class="lg:hidden" data-solo-en="4" hidden> · Plan Plus</span></dd></div>
+          <div class="kv flex"><dt>Equipo</dt><dd data-ref="equipo">Samsung Galaxy A55</dd></div>
+          <div class="kv flex" data-solo-en="1" hidden><dt>Valor</dt><dd data-ref="valor">$ 600.000</dd></div>
+          <div class="kv max-lg:hidden lg:flex" data-solo-en="2 3 4" hidden><dt>Plan</dt><dd data-ref="plan">Plus</dd></div>
+          <div class="kv flex" data-solo-en="4" hidden><dt>Titular</dt><dd data-ref="titular">Juan Pérez</dd></div>
+        </dl>
+        <hr class="resumen-separador">
+        <p class="resumen-ayuda" data-solo-en="1" hidden>Completá los datos del equipo para ver el precio.</p>
+        <div class="kv kv-total flex" data-solo-en="2 3 4" hidden><dt>Total mensual</dt><dd data-ref="total">$ 3.000</dd></div>
+        <p class="confianza max-lg:hidden lg:flex">
+          <svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg>
+          Contratación 100% online · cancelás cuando quieras
+        </p>
+      </aside>
+    </div>
+
+
+    <!-- =====================================================
+         06 · ÉXITO
+         ===================================================== -->
+    <section data-paso="5" hidden class="resultado">
+      <div class="resultado-card">
+        <div class="resultado-icono resultado-icono-ok"><svg class="icon size-12" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg></div>
+        <h2 class="resultado-titulo">¡Listo, <span data-ref="nombre">Juan</span>!<br class="lg:hidden"> Tu celular ya está protegido</h2>
+        <p class="resultado-texto">Te enviamos la póliza a <span data-ref="email">juan.perez@mail.com</span></p>
+        <p class="poliza" data-ref="poliza">POL-2026-000123</p>
+        <dl class="detalle">
+          <div class="kv flex"><dt>Plan</dt><dd data-ref="plan">Plus</dd></div>
+          <div class="kv max-lg:hidden lg:flex"><dt>Equipo</dt><dd data-ref="equipo">Samsung Galaxy A55</dd></div>
+          <div class="kv flex"><dt>Vigencia desde</dt><dd data-ref="vigencia">23/10/2026</dd></div>
+          <div class="kv flex"><dt>Cuota mensual</dt><dd data-ref="total">$ 3.000</dd></div>
+        </dl>
+        <div class="resultado-acciones">
+          <button type="button" class="btn btn-xl w-full lg:flex-1">Descargar póliza</button>
+          <button type="button" class="btn btn-xl btn-secundario-lg w-full lg:flex-1" data-variant="ghost" data-accion="inicio">Volver al inicio</button>
+        </div>
+      </div>
     </section>
 
-    <section data-paso="2" hidden>
-      <h2 class="text-2xl font-extrabold">03 · Elegir plan (Paso 2)</h2>
-      <p class="text-slate-500">Acá van los 3 planes.</p>
-    </section>
 
-    <section data-paso="3" hidden>
-      <h2 class="text-2xl font-extrabold">04 · Datos personales (Paso 3)</h2>
-      <p class="text-slate-500">Acá va el formulario del titular.</p>
-    </section>
-
-    <section data-paso="4" hidden>
-      <h2 class="text-2xl font-extrabold">05 · Pago (Paso 4)</h2>
-      <p class="text-slate-500">Acá va el resumen y el formulario de pago.</p>
-    </section>
-
-    <section data-paso="5" hidden>
-      <h2 class="text-2xl font-extrabold">06 · Éxito</h2>
-      <p class="text-slate-500">Acá va la póliza.</p>
-    </section>
-
-    <section data-paso="6" hidden>
-      <h2 class="text-2xl font-extrabold">07 · Error de pago</h2>
-      <p class="text-slate-500">Acá va el mensaje de rechazo.</p>
+    <!-- =====================================================
+         07 · ERROR DE PAGO
+         ===================================================== -->
+    <section data-paso="6" hidden class="resultado">
+      <div class="resultado-card">
+        <div class="resultado-icono resultado-icono-error"><svg class="icon size-12" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-x"/></svg></div>
+        <h2 class="resultado-titulo">No pudimos procesar el pago</h2>
+        <p class="resultado-texto">La tarjeta fue rechazada. Revisá los datos o probá con otro medio de pago. Tus datos quedaron guardados.</p>
+        <div class="alert alert-aviso w-full" role="note">
+          <p>Tarjeta de prueba que fuerza el error: 4000 0000 0000 0002.</p>
+        </div>
+        <div class="resultado-acciones">
+          <button type="button" class="btn btn-xl w-full lg:flex-1" data-accion="reintentar">Reintentar pago</button>
+          <button type="button" class="btn btn-xl w-full lg:flex-1" data-variant="outline" data-accion="cambiar-medio">Cambiar medio de pago</button>
+        </div>
+      </div>
     </section>
 
   </main>
