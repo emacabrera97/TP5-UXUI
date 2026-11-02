@@ -6,6 +6,7 @@
   --primary: #4F46E5;            /* indigo-600 */
   --primary-foreground: #FFFFFF;
   --radius: 0.75rem;
+  --destructive: #DC2626;        /* red-600: Basecoat lo usa para errores (data-invalid) */
 
   /* Tokens propios (los usamos nosotros, no Basecoat) */
   --primary-700: #3730A3;        /* indigo-800: textos destacados */
