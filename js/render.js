@@ -1,6 +1,7 @@
 // js/render.js
 // Pinta la pantalla a partir del estado. No decide nada: solo muestra.
-import { solicitud } from './estado.js';
+import { solicitud, catalogo, planElegido, cuotaDe, esCampo, leerCampo } from './estado.js';
+import { formatearMoneda } from './cotizador.js';
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -13,6 +14,7 @@ const PASOS = {
 };
 const ETAPAS = ['Cotizar', 'Plan', 'Datos', 'Pago'];
 
+// Se llama cada vez que cambia el paso (o llegan los planes).
 export function render() {
   const paso = solicitud.paso;
   const enCheckout = paso >= 1 && paso <= 4;
@@ -36,6 +38,12 @@ export function render() {
   renderTopbar();
   renderStepper();
   renderBoton();
+  if (paso === 2) renderPlanes();
+  renderFormularios();      // rellena los inputs desde el estado (así "Volver" no pierde datos)
+  renderResumen();
+  if (paso === 5) renderExito();
+
+  window.scrollTo(0, 0);    // cada paso arranca arriba de todo
 }
 
 // Barra superior mobile: logo (inicio) / flecha + título (pasos 1-4) / nada (éxito y error).
@@ -58,9 +66,7 @@ function renderStepper() {
   const html = ETAPAS.map((nombre, i) => {
     const n = i + 1;
     const estado = n < paso ? 'completo' : n === paso ? 'activo' : 'pendiente';
-    const marca = estado === 'completo'
-      ? '<svg class="icon" width="12" height="12" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>'
-      : n;
+    const marca = estado === 'completo' ? iconoSvg('i-check', 12, 3) : n;
     const actual = estado === 'activo' ? ' aria-current="step"' : '';
     const barra = n < ETAPAS.length
       ? `<li class="barra" aria-hidden="true"${n < paso ? ' data-completa' : ''}></li>`
@@ -75,4 +81,105 @@ function renderStepper() {
 function renderBoton() {
   const config = PASOS[solicitud.paso];
   if (config) $('#btn-siguiente').textContent = config.boton;
+}
+
+// Rellena cada input con lo que dice el estado. Es lo que evita que
+// "al volver atrás se borren los datos".
+function renderFormularios() {
+  document.querySelectorAll('#checkout [name]').forEach((el) => {
+    if (!esCampo(el.name)) return;
+    const valor = leerCampo(el.name);
+    if (el.type === 'checkbox') el.checked = Boolean(valor);
+    else if (el.type === 'radio') el.checked = el.value === valor;
+    else if (el.name === 'valor') el.value = valor ? formatearMoneda(valor) : '';
+    else el.value = valor ?? '';
+  });
+}
+
+// ---------- Planes (paso 2) ----------
+const iconoSvg = (id, tamano, trazo = 2) =>
+  `<svg class="icon" width="${tamano}" height="${tamano}" viewBox="0 0 24 24" stroke-width="${trazo}" aria-hidden="true"><use href="#${id}"/></svg>`;
+
+// Cada card lista 3 coberturas: con ✓ si el plan la incluye y con ✗ si no.
+function filasCoberturas(plan) {
+  const tiene = (cobertura) => plan.coberturas.includes(cobertura);
+  const tieneRotura = tiene('Rotura total') || tiene('Rotura de pantalla');
+  return [
+    ['Robo con violencia', tiene('Robo con violencia')],
+    [tiene('Rotura total') ? 'Rotura total' : 'Rotura de pantalla', tieneRotura],
+    ['Hurto / pérdida', tiene('Hurto / pérdida')],
+  ];
+}
+
+function renderPlanes() {
+  const contenedor = $('#planes');
+  const leyenda = '<legend class="sr-only">Elegí tu plan</legend>';
+
+  if (catalogo.error || catalogo.planes.length === 0) {
+    contenedor.innerHTML = leyenda + `
+      <div class="alert alert-aviso lg:col-span-3" role="alert">
+        <p>No pudimos cargar los planes. Abrí el sitio con Live Server (no con doble clic) e intentá de nuevo.</p>
+      </div>`;
+    return;
+  }
+
+  contenedor.innerHTML = leyenda + catalogo.planes.map((plan) => {
+    const cuota = cuotaDe(plan);
+    const precio = cuota === null ? '$ —' : formatearMoneda(cuota);
+    const marcado = plan.id === solicitud.plan ? ' checked' : '';
+    const insignia = plan.recomendado ? ' <span class="badge badge-recomendado">Recomendado</span>' : '';
+    const coberturas = filasCoberturas(plan)
+      .map(([texto, incluida]) =>
+        `<li${incluida ? '' : ' data-no'}>${iconoSvg(incluida ? 'i-check' : 'i-x', 14, 3)}${texto}</li>`)
+      .join('');
+
+    return `
+      <label class="plan-card">
+        <input type="radio" name="plan" value="${plan.id}" class="sr-only"${marcado}>
+        <span class="plan-head">
+          <span class="plan-nombre">${plan.nombre}${insignia}</span>
+          <span class="plan-radio" aria-hidden="true"></span>
+        </span>
+        <span class="plan-precio"><strong>${precio}</strong><span>/ mes</span></span>
+        <ul class="plan-coberturas">${coberturas}</ul>
+      </label>`;
+  }).join('');
+}
+
+// ---------- Resumen (se genera UNA sola vez, desde el estado) ----------
+// Escribe un texto en todos los elementos que tengan data-ref="nombre".
+function escribir(ref, texto) {
+  document.querySelectorAll(`[data-ref="${ref}"]`).forEach((el) => { el.textContent = texto; });
+}
+
+// Se exporta porque también se llama al escribir en un campo (sin repintar todo).
+export function renderResumen() {
+  const { equipo, titular } = solicitud;
+  const plan = planElegido();
+  const cuota = plan ? cuotaDe(plan) : null;
+
+  const nombreEquipo = [equipo.marca, equipo.modelo].filter(Boolean).join(' ') || '—';
+  const nombreTitular = [titular.nombre, titular.apellido].filter(Boolean).join(' ') || '—';
+  const total = cuota === null ? '—' : formatearMoneda(cuota);
+  const nombrePlan = plan ? plan.nombre : '—';
+
+  escribir('seguro', 'Celular');
+  escribir('seguro-plan', ` · Plan ${nombrePlan}`);
+  escribir('equipo', nombreEquipo);
+  escribir('valor', equipo.valor ? formatearMoneda(equipo.valor) : '—');
+  escribir('plan', nombrePlan);
+  escribir('titular', nombreTitular);
+  escribir('total', total);
+  // Barra de mobile (paso 2): "Plan Plus · Galaxy A55"  /  "$ 3.000/mes"
+  escribir('barra-plan', `Plan ${nombrePlan} · ${equipo.modelo || '—'}`);
+  escribir('barra-total', cuota === null ? '—' : `${total}/mes`);
+}
+
+// ---------- Pantalla de éxito ----------
+function renderExito() {
+  const { titular } = solicitud;
+  escribir('nombre', titular.nombre || '—');
+  escribir('email', titular.email || '—');
+  escribir('poliza', solicitud.poliza ?? '—');
+  escribir('vigencia', new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }));
 }

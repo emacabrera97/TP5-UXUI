@@ -235,47 +235,11 @@
         </section>
 
         <!-- ---------- PASO 2 · ELEGIR PLAN ---------- -->
-        <!-- H3: estas 3 cards se van a generar desde data/planes.json -->
+        <!-- Las cards de plan las genera render.js desde data/planes.json -->
         <section data-paso="2" hidden>
           <form novalidate>
-            <fieldset class="grid gap-3 lg:grid-cols-3 lg:gap-4">
+            <fieldset id="planes" class="grid gap-3 lg:grid-cols-3 lg:gap-4">
               <legend class="sr-only">Elegí tu plan</legend>
-
-              <label class="plan-card">
-                <input type="radio" name="plan" value="basico" class="sr-only">
-                <span class="plan-head"><span class="plan-nombre">Básico</span><span class="plan-radio" aria-hidden="true"></span></span>
-                <span class="plan-precio"><strong>$ 2.000</strong><span>/ mes</span></span>
-                <ul class="plan-coberturas">
-                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Robo con violencia</li>
-                  <li data-no><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-x"/></svg>Rotura de pantalla</li>
-                  <li data-no><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-x"/></svg>Hurto / pérdida</li>
-                </ul>
-              </label>
-
-              <label class="plan-card">
-                <input type="radio" name="plan" value="plus" class="sr-only" checked>
-                <span class="plan-head">
-                  <span class="plan-nombre">Plus <span class="badge badge-recomendado">Recomendado</span></span>
-                  <span class="plan-radio" aria-hidden="true"></span>
-                </span>
-                <span class="plan-precio"><strong>$ 3.000</strong><span>/ mes</span></span>
-                <ul class="plan-coberturas">
-                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Robo con violencia</li>
-                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Rotura de pantalla</li>
-                  <li data-no><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-x"/></svg>Hurto / pérdida</li>
-                </ul>
-              </label>
-
-              <label class="plan-card">
-                <input type="radio" name="plan" value="premium" class="sr-only">
-                <span class="plan-head"><span class="plan-nombre">Premium</span><span class="plan-radio" aria-hidden="true"></span></span>
-                <span class="plan-precio"><strong>$ 4.500</strong><span>/ mes</span></span>
-                <ul class="plan-coberturas">
-                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Robo con violencia</li>
-                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Rotura total</li>
-                  <li><svg class="icon" width="14" height="14" viewBox="0 0 24 24" stroke-width="3" aria-hidden="true"><use href="#i-check"/></svg>Hurto / pérdida</li>
-                </ul>
-              </label>
             </fieldset>
           </form>
         </section>
@@ -307,12 +271,10 @@
               <input id="nacimiento" name="nacimiento" type="date" autocomplete="bday" aria-describedby="nacimiento-error">
               <p id="nacimiento-error" role="alert" hidden>Tenés que ser mayor de edad</p>
             </div>
-
-            <!-- DEMO H1: así se ve un campo con error (lo maneja validaciones.js en H3) -->
-            <div role="group" class="field col-span-2 lg:col-span-1" data-invalid>
+            <div role="group" class="field col-span-2 lg:col-span-1">
               <label for="email">Email</label>
-              <input id="email" name="email" type="email" autocomplete="email" value="juan.perez@" aria-invalid="true" aria-describedby="email-error">
-              <p id="email-error" role="alert">Ingresá un email válido</p>
+              <input id="email" name="email" type="email" autocomplete="email" aria-describedby="email-error">
+              <p id="email-error" role="alert" hidden>Ingresá un email válido</p>
             </div>
 
             <div role="group" class="field col-span-2 lg:col-span-1">
@@ -400,7 +362,7 @@
       <aside id="resumen" class="card resumen order-first lg:order-none" aria-label="Resumen de la solicitud">
         <h2 class="resumen-titulo hidden lg:block">Resumen</h2>
         <dl class="resumen-lista">
-          <div class="kv flex"><dt>Seguro</dt><dd><span data-ref="seguro">Celular</span><span class="lg:hidden" data-solo-en="4" hidden> · Plan Plus</span></dd></div>
+          <div class="kv flex"><dt>Seguro</dt><dd><span data-ref="seguro">Celular</span><span class="lg:hidden" data-ref="seguro-plan" data-solo-en="4" hidden> · Plan Plus</span></dd></div>
           <div class="kv flex"><dt>Equipo</dt><dd data-ref="equipo">Samsung Galaxy A55</dd></div>
           <div class="kv flex" data-solo-en="1" hidden><dt>Valor</dt><dd data-ref="valor">$ 600.000</dd></div>
           <div class="kv max-lg:hidden lg:flex" data-solo-en="2 3 4" hidden><dt>Plan</dt><dd data-ref="plan">Plus</dd></div>
@@ -433,8 +395,8 @@
           <div class="kv flex"><dt>Cuota mensual</dt><dd data-ref="total">$ 3.000</dd></div>
         </dl>
         <div class="resultado-acciones">
-          <button type="button" class="btn btn-xl w-full lg:flex-1">Descargar póliza</button>
-          <button type="button" class="btn btn-xl btn-secundario-lg w-full lg:flex-1" data-variant="ghost" data-accion="inicio">Volver al inicio</button>
+          <button type="button" class="btn btn-xl w-full lg:flex-1" data-accion="imprimir">Descargar póliza</button>
+          <button type="button" class="btn btn-xl btn-secundario-lg w-full lg:flex-1" data-variant="ghost" data-accion="reiniciar">Volver al inicio</button>
         </div>
       </div>
     </section>
