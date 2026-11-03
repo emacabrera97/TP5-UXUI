@@ -4,15 +4,15 @@ Trabajo práctico de **Diseño UXUI 2026** · Licenciatura en Sistemas de Inform
 Front-end de un checkout de contratación de seguros: el usuario cotiza su celular, elige un plan,
 carga sus datos, paga (simulado) y recibe su número de póliza.
 
-**Sitio publicado:** https://USUARIO.github.io/cubri-seguros/ <!-- reemplazar USUARIO por tu usuario de GitHub -->
+**Sitio publicado:** https://emacabrera97.github.io/TP5-UXUI/
 
 ## Cómo correrlo
 
 No requiere Node ni compilación. Hace falta conexión a internet (Tailwind, Basecoat y la fuente Inter se cargan por CDN).
 
-1. Clonar el repositorio: `git clone https://github.com/USUARIO/cubri-seguros.git`
-2. Abrir la carpeta en **VS Code** y usar la extensión **Live Server** (clic derecho sobre `index.html` → *Open with Live Server*).
-   - Alternativa sin VS Code: `npx serve` dentro de la carpeta.
+1. Clonar el repositorio: `git clone https://github.com/emacabrera97/TP5-UXUI.git`
+2. Abrir la carpeta en **VS Code** y usar la extensión **Live Server** (clic derecho sobre `index.html` → _Open with Live Server_).
+    - Alternativa sin VS Code: `npx serve` dentro de la carpeta.
 3. **No abrir `index.html` con doble clic**: el `fetch` de `data/planes.json` falla con `file://`.
 
 ## Stack
@@ -35,6 +35,7 @@ cubri-seguros/
     ├── render.js         pinta cada paso a partir del estado
     ├── validaciones.js   funciones puras: reciben un valor y devuelven el error o null
     ├── cotizador.js      calcularCuota() y formato de moneda
+    ├── mascaras.js       máscaras de input (bonus)
     └── pago.js           simularPago() y generarPoliza()
 ```
 
@@ -57,19 +58,19 @@ cubri-seguros/
 
 `cuota = Math.round(valor × tasaAnual / 12 × factorAntiguedad)`
 
-| Valor | Antigüedad | Básico | Plus | Premium |
-|---|---|---|---|---|
-| $ 600.000 | Menos de 1 año | $ 2.000 | $ 3.000 | $ 4.500 |
-| $ 600.000 | 1 a 2 años | $ 2.200 | $ 3.300 | $ 4.950 |
-| $ 1.200.000 | Más de 2 años | $ 5.000 | $ 7.500 | $ 11.250 |
+| Valor       | Antigüedad     | Básico  | Plus    | Premium  |
+| ----------- | -------------- | ------- | ------- | -------- |
+| $ 600.000   | Menos de 1 año | $ 2.000 | $ 3.000 | $ 4.500  |
+| $ 600.000   | 1 a 2 años     | $ 2.200 | $ 3.300 | $ 4.950  |
+| $ 1.200.000 | Más de 2 años  | $ 5.000 | $ 7.500 | $ 11.250 |
 
 Tarjetas de prueba (nunca usar tarjetas reales):
 
-| Número | Resultado |
-|---|---|
-| `4111 1111 1111 1111` | Aprobado → pantalla de éxito |
-| `4000 0000 0000 0002` | Rechazado → pantalla de error |
-| Cualquier otro número de 16 dígitos | Aprobado |
+| Número                              | Resultado                     |
+| ----------------------------------- | ----------------------------- |
+| `4111 1111 1111 1111`               | Aprobado → pantalla de éxito  |
+| `4000 0000 0000 0002`               | Rechazado → pantalla de error |
+| Cualquier otro número de 16 dígitos | Aprobado                      |
 
 El número de póliza tiene el formato `POL-AAAA-NNNNNN` (el contador vive en memoria: se reinicia al recargar la página).
 
@@ -91,31 +92,35 @@ El número de póliza tiene el formato `POL-AAAA-NNNNNN` (el contador vive en me
 
 ### Mobile (390 px)
 
-| 01 · Inicio | 02 · Cotizar | 03 · Elegir plan | 04 · Datos |
-|---|---|---|---|
+| 01 · Inicio                                     | 02 · Cotizar                                      | 03 · Elegir plan                                | 04 · Datos                                    |
+| ----------------------------------------------- | ------------------------------------------------- | ----------------------------------------------- | --------------------------------------------- |
 | ![Inicio mobile](capturas/mobile-01-inicio.png) | ![Cotizar mobile](capturas/mobile-02-cotizar.png) | ![Planes mobile](capturas/mobile-03-planes.png) | ![Datos mobile](capturas/mobile-04-datos.png) |
 
-| 05 · Pago | 06 · Éxito | 07 · Error de pago |
-|---|---|---|
+| 05 · Pago                                   | 06 · Éxito                                    | 07 · Error de pago                            |
+| ------------------------------------------- | --------------------------------------------- | --------------------------------------------- |
 | ![Pago mobile](capturas/mobile-05-pago.png) | ![Éxito mobile](capturas/mobile-06-exito.png) | ![Error mobile](capturas/mobile-07-error.png) |
 
 ### Desktop (1440 px)
 
-| 01 · Inicio | 02 · Cotizar |
-|---|---|
+| 01 · Inicio                                       | 02 · Cotizar                                        |
+| ------------------------------------------------- | --------------------------------------------------- |
 | ![Inicio desktop](capturas/desktop-01-inicio.png) | ![Cotizar desktop](capturas/desktop-02-cotizar.png) |
 
-| 03 · Elegir plan | 04 · Datos |
-|---|---|
+| 03 · Elegir plan                                  | 04 · Datos                                      |
+| ------------------------------------------------- | ----------------------------------------------- |
 | ![Planes desktop](capturas/desktop-03-planes.png) | ![Datos desktop](capturas/desktop-04-datos.png) |
 
-| 05 · Pago | 06 · Éxito | 07 · Error de pago |
-|---|---|---|
+| 05 · Pago                                     | 06 · Éxito                                      | 07 · Error de pago                              |
+| --------------------------------------------- | ----------------------------------------------- | ----------------------------------------------- |
 | ![Pago desktop](capturas/desktop-05-pago.png) | ![Éxito desktop](capturas/desktop-06-exito.png) | ![Error desktop](capturas/desktop-07-error.png) |
 
 ## Bonus realizados
 
-_Ninguno por ahora._ <!-- completar si se hacen: persistencia, editar desde el resumen, toast, máscaras, modo oscuro -->
+- **Persistencia en `localStorage`.** La solicitud sobrevive a un F5 y se borra al terminar (pago aprobado) o al reiniciar.
+  Por seguridad **nunca se guardan** el número de tarjeta, el vencimiento ni el CVV: `localStorage` no está protegido
+  y cualquier script de la página podría leerlo. Si el navegador bloquea el almacenamiento, la app funciona igual.
+- **Máscaras de input** (`js/mascaras.js`): tarjeta en grupos de 4, vencimiento con barra automática (`MM/AA`),
+  y CVV y DNI solo con números.
 
 ## Créditos
 

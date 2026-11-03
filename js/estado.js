@@ -32,6 +32,7 @@ export const tocados = new Set();
 // Cambia de paso y vuelve a pintar. Siempre: primero el estado, después render().
 export function irAPaso(n) {
   solicitud.paso = n;
+  guardarEnNavegador();
   render();
 }
 
@@ -72,6 +73,7 @@ async function pagar() {
   if (solicitud.paso !== 4) return;                 // el usuario se fue a otra pantalla mientras esperaba
   if (resultado.ok) {
     solicitud.poliza = generarPoliza();
+    limpiarGuardado();                              // la solicitud terminó: no tiene sentido recuperarla
     irAPaso(5);                                     // éxito
   } else {
     irAPaso(6);                                     // error: los datos quedan guardados en `solicitud`
@@ -82,6 +84,7 @@ async function pagar() {
 export function reiniciar() {
   Object.assign(solicitud, estadoInicial());
   tocados.clear();
+  limpiarGuardado();
   irAPaso(0);
 }
 
@@ -119,6 +122,7 @@ export function guardarCampo(nombre, valor) {
   const [grupo, clave] = RUTAS[nombre];
   if (grupo) solicitud[grupo][clave] = valor;
   else solicitud[clave] = valor;
+  guardarEnNavegador();
 }
 
 // ---------- Validación ----------
@@ -163,5 +167,55 @@ export async function cargarPlanes() {
   } catch (error) {
     catalogo.error = error.message;
     console.error('No se pudieron cargar los planes:', error);
+  }
+}
+
+// ---------- Persistencia (bonus) ----------
+// La solicitud se guarda en localStorage para sobrevivir a un F5, y se borra al terminar.
+// OJO: NUNCA se guardan número de tarjeta, vencimiento ni CVV. localStorage no está
+// protegido: cualquier script de la página podría leerlo. Solo guardamos el medio de pago elegido.
+const CLAVE_GUARDADO = 'cubri-solicitud';
+
+function guardarEnNavegador() {
+  try {
+    if (solicitud.paso === 5) { limpiarGuardado(); return; }        // éxito: nada para recuperar
+    const { paso, equipo, plan, titular, pago } = solicitud;
+    const copia = {
+      paso: paso === 6 ? 4 : paso,                                  // desde el error se retoma en el pago
+      equipo, plan, titular,
+      pago: { metodo: pago.metodo },
+    };
+    localStorage.setItem(CLAVE_GUARDADO, JSON.stringify(copia));
+  } catch {
+    // Sin localStorage (modo privado, bloqueado): la app funciona igual, solo que sin guardar.
+  }
+}
+
+export function limpiarGuardado() {
+  try { localStorage.removeItem(CLAVE_GUARDADO); } catch { /* ver arriba */ }
+}
+
+// Copia solo las claves que ya existen en `destino` y que tienen el mismo tipo de dato.
+function copiarConocidos(destino, origen) {
+  if (!origen || typeof origen !== 'object') return;
+  for (const clave of Object.keys(destino)) {
+    if (typeof origen[clave] === typeof destino[clave]) destino[clave] = origen[clave];
+  }
+}
+
+// Se llama una vez al arrancar. Devuelve true si había una solicitud guardada.
+export function restaurarGuardado() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(CLAVE_GUARDADO));
+    if (!guardado || typeof guardado !== 'object') return false;
+
+    copiarConocidos(solicitud.equipo, guardado.equipo);
+    copiarConocidos(solicitud.titular, guardado.titular);
+    if (typeof guardado.plan === 'string') solicitud.plan = guardado.plan;
+    if (['credito', 'debito'].includes(guardado.pago?.metodo)) solicitud.pago.metodo = guardado.pago.metodo;
+    if (Number.isInteger(guardado.paso) && guardado.paso >= 0 && guardado.paso <= 4) solicitud.paso = guardado.paso;
+    return true;
+  } catch {
+    return false;                                                    // JSON roto o sin acceso: se ignora
   }
 }

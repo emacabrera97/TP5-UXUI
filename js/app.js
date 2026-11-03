@@ -2,10 +2,11 @@
 // Arranque, eventos y navegación. Acá solo se "escucha": la lógica vive en los otros archivos.
 import {
   irAPaso, volver, siguiente, reiniciar,
-  guardarCampo, leerCampo, esCampo, marcarTocado, cargarPlanes,
+  guardarCampo, leerCampo, esCampo, marcarTocado, cargarPlanes, restaurarGuardado,
 } from './estado.js';
 import { render, renderResumen, renderBoton, renderCampo } from './render.js';
 import { formatearMoneda } from './cotizador.js';
+import { aplicarMascara } from './mascaras.js';
 
 // ---------- Clics: un solo "oyente" para todo el documento (delegación de eventos) ----------
 document.addEventListener('click', (evento) => {
@@ -49,6 +50,12 @@ checkout.addEventListener('input', (evento) => {
   const el = evento.target;
   if (!esCampo(el.name)) return;
 
+  // Máscaras (tarjeta, vencimiento, CVV, DNI): se formatea el texto antes de guardarlo.
+  if (esTexto(el)) {
+    const conFormato = aplicarMascara(el.name, el.value);
+    if (conFormato !== el.value) el.value = conFormato;
+  }
+
   guardarCampo(el.name, leerDelInput(el));
   if (!esTexto(el)) marcarTocado(el.name);
   renderCampo(el.name);       // solo muestra error si el campo ya fue tocado (y lo borra apenas se corrige)
@@ -83,6 +90,7 @@ checkout.addEventListener('keydown', (evento) => {
 document.addEventListener('submit', (evento) => evento.preventDefault());
 
 // ---------- Arranque ----------
+restaurarGuardado();      // si había una solicitud a medias (F5), se recupera
 render();                 // primer pintado: pantalla de inicio
 await cargarPlanes();     // fetch de data/planes.json
 render();                 // repinta con los planes ya cargados
