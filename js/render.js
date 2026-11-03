@@ -91,11 +91,15 @@ export function renderBoton() {
   const config = PASOS[paso];
   if (!config) return;
 
+  const { procesando } = solicitud;
   const boton = $('#btn-siguiente');
-  boton.textContent = config.boton;
+  boton.textContent = procesando ? 'Procesando…' : config.boton;
 
   const faltan = paso === 1 || paso === 3 ? camposInvalidos(paso) : [];
-  boton.disabled = faltan.length > 0;
+  boton.disabled = procesando || faltan.length > 0;
+  boton.setAttribute('aria-busy', String(procesando));
+  // Mientras se procesa el pago tampoco se puede volver atrás.
+  document.querySelectorAll('[data-accion="volver"]').forEach((b) => { b.disabled = procesando; });
 
   const ayuda = faltan.length > 0
     ? `Falta completar: ${lista.format(faltan.map((nombre) => ETIQUETAS[nombre]))}`

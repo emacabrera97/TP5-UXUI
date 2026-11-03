@@ -1,9 +1,10 @@
 // js/estado.js
 // ÚNICA fuente de verdad: toda la información del flujo vive en el objeto `solicitud`.
 // El HTML solo muestra lo que diga este objeto (nunca leas datos de un <span>).
-import { render, renderErrores, enfocarCampo } from './render.js';
+import { render, renderBoton, renderErrores, enfocarCampo } from './render.js';
 import { calcularCuota, FACTORES_ANTIGUEDAD } from './cotizador.js';
 import { camposDelPaso, validarCampo } from './validaciones.js';
+import { simularPago, generarPoliza } from './pago.js';
 
 // Función que devuelve un estado "limpio". La usamos al arrancar y al reiniciar.
 const estadoInicial = () => ({
@@ -14,6 +15,7 @@ const estadoInicial = () => ({
              email: '', celular: '', terminos: false },
   pago: { metodo: 'credito', tarjeta: '', vencimiento: '', cvv: '', titular: '' },
   poliza: null,
+  procesando: false,        // true mientras se espera la respuesta del pago
 });
 
 export const solicitud = estadoInicial();
@@ -44,7 +46,7 @@ export function volver() {
 // si hay errores, se muestran todos y el foco va al primero.
 export function siguiente() {
   const { paso } = solicitud;
-  if (paso < 1 || paso > 4) return;
+  if (paso < 1 || paso > 4 || solicitud.procesando) return;
 
   const invalidos = camposInvalidos(paso);
   if (invalidos.length > 0) {
@@ -54,11 +56,25 @@ export function siguiente() {
     return;
   }
 
-  if (paso <= 3) {
-    irAPaso(paso + 1);
+  if (paso <= 3) irAPaso(paso + 1);
+  else pagar();
+}
+
+// Paso 4: pago simulado. El botón se deshabilita APENAS se hace clic (evita el doble pago)
+// y solo vuelve a habilitarse si el pago falla y el usuario regresa al paso 4.
+async function pagar() {
+  solicitud.procesando = true;
+  renderBoton();                                    // muestra "Procesando…" y deshabilita
+
+  const resultado = await simularPago(solicitud.pago.tarjeta);
+  solicitud.procesando = false;
+
+  if (solicitud.paso !== 4) return;                 // el usuario se fue a otra pantalla mientras esperaba
+  if (resultado.ok) {
+    solicitud.poliza = generarPoliza();
+    irAPaso(5);                                     // éxito
   } else {
-    // H4: acá va el pago simulado. Por ahora salta directo a la pantalla de éxito.
-    irAPaso(5);
+    irAPaso(6);                                     // error: los datos quedan guardados en `solicitud`
   }
 }
 

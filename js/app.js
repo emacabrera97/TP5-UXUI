@@ -7,11 +7,6 @@ import {
 import { render, renderResumen, renderBoton, renderCampo } from './render.js';
 import { formatearMoneda } from './cotizador.js';
 
-// ---------- Botones temporales de desarrollo (los borramos al final) ----------
-document.querySelectorAll('[data-ir]').forEach((boton) => {
-  boton.addEventListener('click', () => irAPaso(Number(boton.dataset.ir)));
-});
-
 // ---------- Clics: un solo "oyente" para todo el documento (delegación de eventos) ----------
 document.addEventListener('click', (evento) => {
   // Los links de ejemplo (href="#") no tienen que saltar al inicio de la página.
