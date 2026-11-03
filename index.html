@@ -336,12 +336,13 @@
           </div>
           <div class="flex items-center gap-3 lg:justify-between">
             <button type="button" class="btn btn-xl hidden w-40 lg:inline-flex" data-variant="outline" data-accion="volver" data-solo-en="2 3 4">Volver</button>
-            <div class="flex flex-1 items-center justify-end gap-4 lg:ml-auto lg:flex-none">
-              <p id="ayuda-boton-desktop" class="hidden max-w-xs text-right text-[13px] text-slate-500 lg:block" data-ayuda-boton hidden></p>
-              <button type="button" id="btn-siguiente" class="btn btn-xl w-full lg:w-[240px]" data-accion="siguiente" aria-describedby="ayuda-boton-desktop ayuda-boton-movil">Ver planes</button>
+            <div class="flex flex-1 justify-end lg:ml-auto lg:flex-none">
+              <button type="button" id="btn-siguiente" class="btn btn-xl w-full lg:w-[240px]" data-accion="siguiente" aria-describedby="ayuda-boton">Ver planes</button>
             </div>
           </div>
-          <p id="ayuda-boton-movil" class="text-center text-xs text-slate-500 lg:hidden" data-ayuda-boton hidden></p>
+          <!-- Qué falta para habilitar el botón (lo escribe renderBoton). Va en su propia fila:
+               si fuera al costado, un texto largo empujaría al botón fuera de la card. -->
+          <p id="ayuda-boton" class="text-center text-xs text-slate-500 lg:text-right lg:text-[13px]" data-ayuda-boton hidden></p>
         </footer>
       </div>
 
