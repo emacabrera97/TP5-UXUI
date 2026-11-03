@@ -349,11 +349,11 @@
           <div class="flex items-center gap-3 lg:justify-between">
             <button type="button" class="btn btn-xl hidden w-40 lg:inline-flex" data-variant="outline" data-accion="volver" data-solo-en="2 3 4">Volver</button>
             <div class="flex flex-1 items-center justify-end gap-4 lg:ml-auto lg:flex-none">
-              <p class="hidden text-[13px] text-slate-500 lg:block" data-solo-en="3" hidden>Completá los campos con error para continuar</p>
-              <button type="button" id="btn-siguiente" class="btn btn-xl w-full lg:w-[240px]" data-accion="siguiente">Ver planes</button>
+              <p id="ayuda-boton-desktop" class="hidden max-w-xs text-right text-[13px] text-slate-500 lg:block" data-ayuda-boton hidden></p>
+              <button type="button" id="btn-siguiente" class="btn btn-xl w-full lg:w-[240px]" data-accion="siguiente" aria-describedby="ayuda-boton-desktop ayuda-boton-movil">Ver planes</button>
             </div>
           </div>
-          <p class="text-center text-xs text-slate-500 lg:hidden" data-solo-en="3" hidden>El botón se habilita cuando el formulario es válido</p>
+          <p id="ayuda-boton-movil" class="text-center text-xs text-slate-500 lg:hidden" data-ayuda-boton hidden></p>
         </footer>
       </div>
 

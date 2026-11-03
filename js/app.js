@@ -2,9 +2,9 @@
 // Arranque, eventos y navegación. Acá solo se "escucha": la lógica vive en los otros archivos.
 import {
   irAPaso, volver, siguiente, reiniciar,
-  guardarCampo, leerCampo, esCampo, cargarPlanes,
+  guardarCampo, leerCampo, esCampo, marcarTocado, cargarPlanes,
 } from './estado.js';
-import { render, renderResumen } from './render.js';
+import { render, renderResumen, renderBoton, renderCampo } from './render.js';
 import { formatearMoneda } from './cotizador.js';
 
 // ---------- Botones temporales de desarrollo (los borramos al final) ----------
@@ -46,21 +46,45 @@ function leerDelInput(el) {
   return el.value;
 }
 
+// Campos de texto: el error se muestra al SALIR del campo. Selects, radios y checkbox
+// no tienen un "salir" útil, así que se consideran tocados apenas cambian.
+const esTexto = (el) => el.matches('input:not([type="radio"]):not([type="checkbox"])');
+
 checkout.addEventListener('input', (evento) => {
   const el = evento.target;
   if (!esCampo(el.name)) return;
+
   guardarCampo(el.name, leerDelInput(el));
+  if (!esTexto(el)) marcarTocado(el.name);
+  renderCampo(el.name);       // solo muestra error si el campo ya fue tocado (y lo borra apenas se corrige)
   renderResumen();            // solo el resumen: repintar todo movería el cursor al escribir
+  renderBoton();              // habilita o deshabilita el botón
 });
 
-// Al salir del campo "valor" lo mostramos con formato: 600000 -> $ 600.000
 checkout.addEventListener('focusout', (evento) => {
-  if (evento.target.name !== 'valor') return;
-  const valor = leerCampo('valor');
-  evento.target.value = valor ? formatearMoneda(valor) : '';
+  const el = evento.target;
+  if (!esCampo(el.name)) return;
+
+  // Al salir del campo "valor" lo mostramos con formato: 600000 -> $ 600.000
+  if (el.name === 'valor') {
+    const valor = leerCampo('valor');
+    el.value = valor ? formatearMoneda(valor) : '';
+  }
+  if (esTexto(el)) {
+    marcarTocado(el.name);
+    renderCampo(el.name);
+  }
 });
 
-// Enter dentro de un formulario no tiene que recargar la página.
+// Enter dentro de un campo = intentar avanzar (valida todo y lleva el foco al primer error).
+checkout.addEventListener('keydown', (evento) => {
+  if (evento.key === 'Enter' && esTexto(evento.target)) {
+    evento.preventDefault();
+    siguiente();
+  }
+});
+
+// Ningún formulario tiene que recargar la página.
 document.addEventListener('submit', (evento) => evento.preventDefault());
 
 // ---------- Arranque ----------

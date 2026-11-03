@@ -1,7 +1,11 @@
 // js/render.js
 // Pinta la pantalla a partir del estado. No decide nada: solo muestra.
-import { solicitud, catalogo, planElegido, cuotaDe, esCampo, leerCampo } from './estado.js';
+import {
+  solicitud, catalogo, tocados, planElegido, cuotaDe,
+  esCampo, leerCampo, mensajeDe, camposInvalidos,
+} from './estado.js';
 import { formatearMoneda } from './cotizador.js';
+import { camposDelPaso, ETIQUETAS } from './validaciones.js';
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -40,6 +44,7 @@ export function render() {
   renderBoton();
   if (paso === 2) renderPlanes();
   renderFormularios();      // rellena los inputs desde el estado (así "Volver" no pierde datos)
+  renderErrores();          // errores de los campos que ya se tocaron
   renderResumen();
   if (paso === 5) renderExito();
 
@@ -77,10 +82,65 @@ function renderStepper() {
   $('#stepper').innerHTML = html;
 }
 
-// Texto del botón principal según el paso.
-function renderBoton() {
-  const config = PASOS[solicitud.paso];
-  if (config) $('#btn-siguiente').textContent = config.boton;
+// Botón principal: texto según el paso y, en los pasos 1 y 3, deshabilitado hasta que todo sea válido.
+// Un botón deshabilitado necesita una explicación: se lista qué campos faltan.
+const lista = new Intl.ListFormat('es', { style: 'long', type: 'conjunction' });
+
+export function renderBoton() {
+  const paso = solicitud.paso;
+  const config = PASOS[paso];
+  if (!config) return;
+
+  const boton = $('#btn-siguiente');
+  boton.textContent = config.boton;
+
+  const faltan = paso === 1 || paso === 3 ? camposInvalidos(paso) : [];
+  boton.disabled = faltan.length > 0;
+
+  const ayuda = faltan.length > 0
+    ? `Falta completar: ${lista.format(faltan.map((nombre) => ETIQUETAS[nombre]))}`
+    : '';
+  document.querySelectorAll('[data-ayuda-boton]').forEach((el) => {
+    el.hidden = faltan.length === 0;
+    el.textContent = ayuda;
+  });
+}
+
+// ---------- Errores en línea ----------
+// Muestra u oculta el error de UN campo. Solo lo muestra si el campo ya se tocó.
+// Cada mensaje tiene id="<name>-error" y vive dentro del .field del campo.
+export function renderCampo(nombre) {
+  const aviso = document.getElementById(`${nombre}-error`);
+  if (!aviso) return;
+
+  const mensaje = mensajeDe(nombre);
+  const mostrar = tocados.has(nombre) && mensaje !== null;
+  const campo = aviso.closest('.field');
+
+  campo.toggleAttribute('data-invalid', mostrar);       // Basecoat pinta borde y texto en rojo
+  aviso.hidden = !mostrar;
+  if (mostrar) aviso.textContent = mensaje;
+  campo.querySelectorAll('[name]').forEach((el) => {
+    if (mostrar) el.setAttribute('aria-invalid', 'true');
+    else el.removeAttribute('aria-invalid');
+  });
+
+  // Si el campo tiene texto de ayuda (ej.: rango del valor), se oculta mientras hay error.
+  const ayuda = document.getElementById(`${nombre}-ayuda`);
+  if (ayuda) ayuda.hidden = mostrar;
+}
+
+// Repinta los errores de todos los campos del paso actual.
+export function renderErrores() {
+  camposDelPaso(solicitud.paso).forEach(renderCampo);
+}
+
+// Lleva el foco a un campo (para que el teclado y los lectores de pantalla vayan al error).
+export function enfocarCampo(nombre) {
+  const el = document.querySelector(`#checkout [name="${nombre}"]`);
+  if (!el) return;
+  el.focus();
+  el.scrollIntoView?.({ block: 'center' });
 }
 
 // Rellena cada input con lo que dice el estado. Es lo que evita que

@@ -1,8 +1,9 @@
 // js/estado.js
 // ÚNICA fuente de verdad: toda la información del flujo vive en el objeto `solicitud`.
 // El HTML solo muestra lo que diga este objeto (nunca leas datos de un <span>).
-import { render } from './render.js';
+import { render, renderErrores, enfocarCampo } from './render.js';
 import { calcularCuota, FACTORES_ANTIGUEDAD } from './cotizador.js';
+import { camposDelPaso, validarCampo } from './validaciones.js';
 
 // Función que devuelve un estado "limpio". La usamos al arrancar y al reiniciar.
 const estadoInicial = () => ({
@@ -20,6 +21,10 @@ export const solicitud = estadoInicial();
 // Los planes vienen de data/planes.json. No son parte de la solicitud: son el catálogo.
 export const catalogo = { planes: [], error: null };
 
+// Campos que ya "se tocaron" (el usuario salió de ellos o intentó avanzar).
+// Un campo vacío NO muestra error hasta que entra en este conjunto.
+export const tocados = new Set();
+
 // ---------- Navegación ----------
 
 // Cambia de paso y vuelve a pintar. Siempre: primero el estado, después render().
@@ -35,12 +40,23 @@ export function volver() {
   else if (paso === 6) irAPaso(4);          // desde el error, de vuelta al pago
 }
 
+// Botón principal. Antes de avanzar se revalida TODO el paso:
+// si hay errores, se muestran todos y el foco va al primero.
 export function siguiente() {
   const { paso } = solicitud;
-  if (paso >= 1 && paso <= 3) {
-    // H3: antes de avanzar vamos a validar el paso actual.
+  if (paso < 1 || paso > 4) return;
+
+  const invalidos = camposInvalidos(paso);
+  if (invalidos.length > 0) {
+    invalidos.forEach((nombre) => tocados.add(nombre));
+    renderErrores();
+    enfocarCampo(invalidos[0]);
+    return;
+  }
+
+  if (paso <= 3) {
     irAPaso(paso + 1);
-  } else if (paso === 4) {
+  } else {
     // H4: acá va el pago simulado. Por ahora salta directo a la pantalla de éxito.
     irAPaso(5);
   }
@@ -49,6 +65,7 @@ export function siguiente() {
 // "Volver al inicio" desde el éxito: borra todo y arranca de cero.
 export function reiniciar() {
   Object.assign(solicitud, estadoInicial());
+  tocados.clear();
   irAPaso(0);
 }
 
@@ -86,6 +103,22 @@ export function guardarCampo(nombre, valor) {
   const [grupo, clave] = RUTAS[nombre];
   if (grupo) solicitud[grupo][clave] = valor;
   else solicitud[clave] = valor;
+}
+
+// ---------- Validación ----------
+
+export function marcarTocado(nombre) {
+  tocados.add(nombre);
+}
+
+// Mensaje de error de un campo según lo que dice el estado (o null si está bien).
+export function mensajeDe(nombre) {
+  return validarCampo(nombre, leerCampo(nombre));
+}
+
+// Campos del paso que hoy tienen error (estén tocados o no).
+export function camposInvalidos(paso = solicitud.paso) {
+  return camposDelPaso(paso).filter((nombre) => mensajeDe(nombre) !== null);
 }
 
 // ---------- Consultas sobre el estado ----------
